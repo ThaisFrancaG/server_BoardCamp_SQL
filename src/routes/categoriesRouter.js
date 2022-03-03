@@ -3,7 +3,7 @@ import {
   getCategories,
   postCategories,
 } from "../controllers/categoriesController.js";
-import { validateCategorieSchema } from "../middleware/categorieValidation.js";
+import { validateCategorieSchema } from "../middleware/generalValidation.js";
 import categorieSchema from "../schemas/categoriesSchema.js";
 
 const categoriesRouter = Router();
