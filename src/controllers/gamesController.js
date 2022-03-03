@@ -23,7 +23,7 @@ export async function postGame(req, res) {
     let gameArray = [name, image, stockTotal, categoryId, pricePerDay];
 
     if (!image) {
-      const imageAlt = "http://imagemPadrao";
+      const imageAlt = "https://i.imgur.com/bScOrgR.jpeg";
       gameArray = [name, imageAlt, stockTotal, categoryId, pricePerDay];
     }
     await connection.query(
@@ -32,6 +32,18 @@ export async function postGame(req, res) {
     );
 
     res.status(201).send("Tá ok");
+  } catch (error) {
+    console.log(error);
+    res.sendStatus(500);
+  }
+}
+
+export async function getGame(req, res) {
+  try {
+    const gamesList = await connection.query(`SELECT * FROM games`);
+
+    console.log(gamesList.rows);
+    res.status(200).send(gamesList.rows);
   } catch (error) {
     console.log(error);
     res.sendStatus(500);
