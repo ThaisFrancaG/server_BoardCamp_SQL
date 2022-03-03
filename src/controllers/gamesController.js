@@ -21,6 +21,8 @@ export async function postGame(req, res) {
 
     //aqui, parte do pressuposto de que passou em todos os testes
     let gameArray = [name, image, stockTotal, categoryId, pricePerDay];
+    console.log("veio do front");
+    console.log(gameArray);
 
     if (!image) {
       const imageAlt = "https://i.imgur.com/bScOrgR.jpeg";
@@ -40,9 +42,26 @@ export async function postGame(req, res) {
 
 export async function getGame(req, res) {
   try {
+    let gameName = req.query.name;
+
+    if (gameName) {
+      if (gameName.length < 2) {
+        gameName = gameName.toUpperCase();
+      }
+
+      if (gameName.length >= 2) {
+        gameName = gameName[0].toUpperCase() + gameName.slice(1).toLowerCase();
+      }
+
+      const gamesListFilter = await connection.query(
+        `SELECT * FROM games WHERE name LIKE '%${gameName}%'`
+      );
+
+      return res.status(200).send(gamesListFilter.rows);
+    }
+
     const gamesList = await connection.query(`SELECT * FROM games`);
 
-    console.log(gamesList.rows);
     res.status(200).send(gamesList.rows);
   } catch (error) {
     console.log(error);
