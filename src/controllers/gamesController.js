@@ -54,7 +54,8 @@ export async function getGame(req, res) {
       }
 
       const gamesListFilter = await connection.query(
-        `SELECT * FROM games WHERE name LIKE '%${gameName}%'`
+        `SELECT * FROM games WHERE name LIKE $1`,
+        [`${gameName}%`]
       );
 
       return res.status(200).send(gamesListFilter.rows);
