@@ -74,3 +74,45 @@ export async function getOneCustomer(req, res) {
     res.sendStatus(500);
   }
 }
+
+export async function updateCustomer(req, res) {
+  const { name, phone, cpf, birthday } = req.body;
+  console.log(cpf);
+  const { id } = req.params;
+
+  try {
+    console.log(id);
+
+    const customer = await connection.query(
+      `SELECT * FROM customers WHERE id = $1`,
+      [id]
+    );
+    console.log(customer.rows);
+
+    if (customer.rows.length === 0) {
+      return res.status(404).send("Usuário não encontrado");
+    }
+
+    const checkCPFRepetition = await connection.query(
+      `SELECT * FROM customers WHERE cpf = $1`,
+      [cpf]
+    );
+
+    if (checkCPFRepetition.rows.length > 0) {
+      return res.status(409).send("CPF já cadastrado");
+    }
+
+    await connection.query(
+      `
+    UPDATE customers SET
+    name = $1, phone = $2, cpf = $3, birthday = $4
+    WHERE id = $5
+    `,
+      [name, phone, cpf, birthday, id]
+    );
+    res.sendStatus(200);
+  } catch (error) {
+    console.log(error);
+    res.sendStatus(500);
+  }
+}
