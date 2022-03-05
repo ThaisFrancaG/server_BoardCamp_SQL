@@ -23,3 +23,19 @@ export async function postCustomer(req, res) {
     res.sendStatus(500);
   }
 }
+
+export async function getCustomers(req, res) {
+  try {
+  } catch (error) {
+    console.log(error);
+    res.sendStatus(500);
+  }
+}
+
+export async function getOneCustomer(req, res) {
+  try {
+  } catch (error) {
+    console.log(error);
+    res.sendStatus(500);
+  }
+}
