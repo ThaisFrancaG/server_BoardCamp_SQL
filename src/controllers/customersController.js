@@ -10,7 +10,7 @@ export async function postCustomer(req, res) {
     );
 
     if (checkCPFRepetition.rows.length > 0) {
-      return res.status(409).send("CPF já cadastrado");
+      return res.sendStatus(409);
     }
 
     await connection.query(
@@ -54,13 +54,10 @@ export async function getCustomers(req, res) {
 export async function getOneCustomer(req, res) {
   const { id } = req.params;
   try {
-    console.log(id);
-
     const customer = await connection.query(
       `SELECT * FROM customers WHERE id = $1`,
       [id]
     );
-    console.log(customer.rows);
 
     if (customer.rows.length === 0) {
       return res.status(404).send("Usuário não encontrado");
@@ -74,20 +71,17 @@ export async function getOneCustomer(req, res) {
 
 export async function updateCustomer(req, res) {
   const { name, phone, cpf, birthday } = req.body;
-  console.log(cpf);
+
   const { id } = req.params;
 
   try {
-    console.log(id);
-
     const customer = await connection.query(
       `SELECT * FROM customers WHERE id = $1`,
       [id]
     );
-    console.log(customer.rows);
 
     if (customer.rows.length === 0) {
-      return res.status(404).send("Usuário não encontrado");
+      return res.sendStatus(404);
     }
 
     const checkCPFRepetition = await connection.query(
@@ -96,7 +90,7 @@ export async function updateCustomer(req, res) {
     );
 
     if (checkCPFRepetition.rows.length > 0) {
-      return res.status(409).send("CPF já cadastrado");
+      return res.sendStatus(409);
     }
 
     await connection.query(

@@ -16,13 +16,11 @@ export async function postGame(req, res) {
       [categoryId]
     );
     if (checkCategorie.rows.length === 0) {
-      return res.status(400).send("Categoria não existe");
+      return res.sendStatus(400);
     }
 
     //aqui, parte do pressuposto de que passou em todos os testes
     let gameArray = [name, image, stockTotal, categoryId, pricePerDay];
-    console.log("veio do front");
-    console.log(gameArray);
 
     if (!image) {
       const imageAlt = "https://i.imgur.com/bScOrgR.jpeg";
@@ -33,7 +31,7 @@ export async function postGame(req, res) {
       gameArray
     );
 
-    res.status(201).send("Tá ok");
+    res.sendStatus(201);
   } catch (error) {
     console.log(error);
     res.sendStatus(500);

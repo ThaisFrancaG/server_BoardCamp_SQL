@@ -20,14 +20,14 @@ export async function postCategories(req, res) {
     );
 
     if (checkRepetitionName.rows.length > 0) {
-      return res.status(409).send("Essa categoria já existe");
+      return res.sendStatus(409);
     }
 
     await connection.query(`INSERT INTO categories (name) VALUES ($1) `, [
       newCategorie.name,
     ]);
 
-    res.status(201).send("foi");
+    res.sendStatus(201);
   } catch (error) {
     console.log(error);
     res.sendStatus(500);

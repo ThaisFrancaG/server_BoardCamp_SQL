@@ -232,20 +232,16 @@ export async function endRental(req, res) {
         `SELECT "pricePerDay" FROM games WHERE id=$1`,
         [gameId]
       );
-      console.log(pricePerDay.rows);
 
       const delayFee = Math.abs(
         pricePerDay.rows[0].pricePerDay * differenceRentReturn
       );
 
-      console.log(typeof delayFee);
-      console.log(returnedDate);
-
       await connection.query(`UPDATE rentals set "returnDate"=$1 WHERE id=$2`, [
         returnedDate,
         id,
       ]);
-      return res.status(200).send("aluguel finalizado");
+      return res.sendStatus(200);
     }
 
     await connection.query(`UPDATE rentals set "returnDate"=$1, WHERE id=$2`, [
@@ -264,17 +260,24 @@ export async function deleteRental(req, res) {
   try {
     const { id } = req.params;
     const rentalDetails = await connection.query(
-      `SELECT "returnDate" FROM rentals WHERE id=$1`,
+      `SELECT "returnDate","gameId" FROM rentals WHERE id=$1`,
       [id]
     );
+    const { returnDate, gameId } = rentalDetails.rows[0];
+
     if (rentalDetails.rows.length === 0) {
       return res.sendStatus(404);
     }
 
-    if (rentalDetails.rows[0].returnDate === null) {
+    if (returnDate === null) {
       return res.sendStatus(400);
     }
     await connection.query(`DELETE from rentals WHERE id=$1`, [id]);
+
+    await connection.query(
+      `UPDATE games SET "stockTotal" = "stockTotal"+1 WHERE id=$1`,
+      [gameId]
+    );
 
     res.sendStatus(200);
   } catch (error) {
