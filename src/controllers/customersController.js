@@ -88,8 +88,10 @@ export async function updateCustomer(req, res) {
       `SELECT * FROM customers WHERE cpf = $1`,
       [cpf]
     );
+    console.log(checkCPFRepetition.rows);
 
-    if (checkCPFRepetition.rows.length > 0) {
+    console.log(checkCPFRepetition.rows.length);
+    if (checkCPFRepetition.rows.length >= 2) {
       return res.sendStatus(409);
     }
 
