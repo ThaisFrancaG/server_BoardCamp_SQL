@@ -1,5 +1,10 @@
 import { Router } from "express";
-import { getRentals, postRental } from "../controllers/rentalsController.js";
+import {
+  deleteRental,
+  endRental,
+  getRentals,
+  postRental,
+} from "../controllers/rentalsController.js";
 import { validateRentalsSchema } from "../middleware/rentalsValidation.js";
 import rentalsSchema from "../schemas/rentalsSchema.js";
 
@@ -12,5 +17,9 @@ rentalsRouter.post(
 );
 
 rentalsRouter.get("/rentals", getRentals);
+
+rentalsRouter.post("/rentals/:id/return", endRental);
+
+rentalsRouter.delete("/rentals/:id", deleteRental);
 
 export default rentalsRouter;

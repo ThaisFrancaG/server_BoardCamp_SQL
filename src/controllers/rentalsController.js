@@ -199,3 +199,86 @@ export async function getRentals(req, res) {
     res.sendStatus(500);
   }
 }
+
+export async function endRental(req, res) {
+  try {
+    const { id } = req.params;
+    const returnedDate = dayjs().format("YYYY-MM-DD");
+
+    const rentalDetails = await connection.query(
+      `SELECT "rentDate","daysRented", "gameId", "returnDate" FROM rentals WHERE id=$1`,
+      [id]
+    );
+    if (rentalDetails.rows.length === 0) {
+      return res.status(404).send("Aluguel não encontrado");
+    }
+
+    const { rentDate, daysRented, gameId, returnDate } = rentalDetails.rows[0];
+
+    if (returnDate !== null) {
+      return res.sendStatus(400);
+    }
+
+    const expectedReturn = dayjs(rentDate)
+      .add(parseInt(daysRented), "d")
+      .format("YYYY-MM-DD");
+
+    const differenceRentReturn = dayjs(returnedDate).diff(
+      dayjs(expectedReturn),
+      "day"
+    );
+    if (differenceRentReturn < 0) {
+      const pricePerDay = await connection.query(
+        `SELECT "pricePerDay" FROM games WHERE id=$1`,
+        [gameId]
+      );
+      console.log(pricePerDay.rows);
+
+      const delayFee = Math.abs(
+        pricePerDay.rows[0].pricePerDay * differenceRentReturn
+      );
+
+      console.log(typeof delayFee);
+      console.log(returnedDate);
+
+      await connection.query(`UPDATE rentals set "returnDate"=$1 WHERE id=$2`, [
+        returnedDate,
+        id,
+      ]);
+      return res.status(200).send("aluguel finalizado");
+    }
+
+    await connection.query(`UPDATE rentals set "returnDate"=$1, WHERE id=$2`, [
+      returnedDate,
+      id,
+    ]);
+
+    res.sendStatus(200);
+  } catch (error) {
+    console.log(error);
+    res.sendStatus(500);
+  }
+}
+
+export async function deleteRental(req, res) {
+  try {
+    const { id } = req.params;
+    const rentalDetails = await connection.query(
+      `SELECT "returnDate" FROM rentals WHERE id=$1`,
+      [id]
+    );
+    if (rentalDetails.rows.length === 0) {
+      return res.sendStatus(404);
+    }
+
+    if (rentalDetails.rows[0].returnDate === null) {
+      return res.sendStatus(400);
+    }
+    await connection.query(`DELETE from rentals WHERE id=$1`, [id]);
+
+    res.sendStatus(200);
+  } catch (error) {
+    console.log(error);
+    res.sendStatus(500);
+  }
+}

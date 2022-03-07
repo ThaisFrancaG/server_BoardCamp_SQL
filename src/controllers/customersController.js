@@ -37,16 +37,13 @@ export async function getCustomers(req, res) {
       );
 
       if (customerFilter.rows.length === 0) {
-        return res.status(404).send("Usuário não enontrado");
+        return res.sendStatus(404);
       }
       return res.status(200).send(customerFilter.rows);
     }
 
     const customers = await connection.query(`SELECT * FROM customers`);
 
-    if (customers.rows.length === 0) {
-      return res.status(200).send("Não há clientes cadastrados");
-    }
     res.status(200).send(customers.rows);
   } catch (error) {
     console.log(error);
@@ -68,7 +65,7 @@ export async function getOneCustomer(req, res) {
     if (customer.rows.length === 0) {
       return res.status(404).send("Usuário não encontrado");
     }
-    res.status(200).send(customer.rows);
+    res.status(200).send(customer.rows[0]);
   } catch (error) {
     console.log(error);
     res.sendStatus(500);
