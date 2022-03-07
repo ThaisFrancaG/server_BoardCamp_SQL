@@ -76,7 +76,7 @@ export async function updateCustomer(req, res) {
 
   try {
     const customer = await connection.query(
-      `SELECT * FROM customers WHERE id = $1`,
+      `SELECT * FROM customers WHERE id =$1`,
       [id]
     );
 
@@ -85,21 +85,23 @@ export async function updateCustomer(req, res) {
     }
 
     const checkCPFRepetition = await connection.query(
-      `SELECT * FROM customers WHERE cpf = $1`,
+      `SELECT id , cpf  FROM customers WHERE cpf =$1`,
       [cpf]
     );
-    console.log(checkCPFRepetition.rows);
 
-    console.log(checkCPFRepetition.rows.length);
-    if (checkCPFRepetition.rows.length >= 2) {
-      return res.sendStatus(409);
+    if (checkCPFRepetition.rows.length >= 1) {
+      for (let i = 0; i < checkCPFRepetition.rows.length; i++) {
+        if (parseInt(checkCPFRepetition.rows[i].id) != parseInt(id)) {
+          return res.sendStatus(409);
+        }
+      }
     }
 
     await connection.query(
       `
     UPDATE customers SET
-    name = $1, phone = $2, cpf = $3, birthday = $4
-    WHERE id = $5
+    name =$1, phone =$2, cpf =$3, birthday =$4
+    WHERE id =$5
     `,
       [name, phone, cpf, birthday, id]
     );
